@@ -4,7 +4,7 @@ package com.leon.agriculturerobot.config;
  * Created by LML on 2016-05-06.
  */
 public class Constant {
-    /* 控制前后左右停 */
+    /* 控制运动参数：前后左右停 */
     public static final int GO_STOP_CODE = 0;
     public static final int GO_FORWARD_CODE = 1;
     public static final int GO_BACKWARD_CODE = 2;
@@ -22,7 +22,9 @@ public class Constant {
 
     /* 网络参数设置 */
     public static final String SOCKET_IP = "192.168.1.1";
-    public static final String SOCKET_PORT = "2001";
+    public static final String SOCKET_PORT = "2016";
+    public static final String GATEWAY= "http://192.168.1.1";
+
 
 
 }

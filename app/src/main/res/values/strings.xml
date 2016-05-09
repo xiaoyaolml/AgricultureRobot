@@ -3,4 +3,5 @@
     <string name="default_baudrate">9600</string>
     <string name="default_ip">192.168.1.1</string>
     <string name="default_port">2016</string>
+    <string name="title_activity_web">嵌入式网关配置</string>
 </resources>

@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
 //        mLocalControl = new LocalControl();
 //        boolean isSuccess = mLocalControl.init();
 //        if (isSuccess) {
@@ -83,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
 //            Toast.makeText(MainActivity.this, "失败", Toast.LENGTH_SHORT).show();
 //            return;
 //        }
+    }
+
+    public void startWeb(View view) {
+        startActivity(new Intent(this,WebActivity.class));
     }
 
 }
