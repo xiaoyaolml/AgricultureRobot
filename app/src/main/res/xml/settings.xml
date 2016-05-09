@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title=" 设置">
+
+    <PreferenceCategory
+        android:title="串口设置">
+        <ListPreference
+            android:key="DEVICE"
+            android:title="串口选择"
+            android:dialogTitle="请选择串口"/>
+
+        <ListPreference
+            android:key="BAUDRATE"
+            android:title="波特率"
+            android:dialogTitle="请选择波特率"
+            android:entries="@array/baudrates_name"
+            android:entryValues="@array/baudrates_value"
+            android:defaultValue="@string/default_baudrate"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="网络设置">
+        <EditTextPreference
+            android:key="IP"
+            android:title="IP地址"
+            android:defaultValue="@string/default_ip"
+            android:dialogTitle="请输入IP地址"/>
+
+        <EditTextPreference
+            android:key="PORT"
+            android:title="端口号"
+            android:defaultValue="@string/default_port"
+            android:numeric="integer"
+            android:dialogTitle="请输入端口号"/>
+
+    </PreferenceCategory>
+
+    <PreferenceScreen
+        android:key="MORE"
+        android:title="更多设置">
+        <SwitchPreference
+            android:key="LED"
+            android:title="LED灯控制"
+            android:summaryOff="关闭"
+            android:summaryOn="打开"/>
+        <SwitchPreference
+            android:key="RELAY0"
+            android:title="0路继电器控制"
+            android:summary="除草"/>
+        <SwitchPreference
+            android:key="RELAY1"
+            android:title="1路继电器控制"
+            android:summary="施肥"/>
+        <SwitchPreference
+            android:key="RELAY2"
+            android:title="2路继电器控制"
+            android:summary="洒药"/>
+    </PreferenceScreen>
+
+</PreferenceScreen>
