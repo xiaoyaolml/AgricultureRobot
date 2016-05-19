@@ -57,6 +57,30 @@
             android:key="RELAY2"
             android:title="2路继电器控制"
             android:summary="洒药"/>
+
+        <SwitchPreference
+            android:key="RELAY3"
+            android:title="3路继电器控制"
+            android:summaryOff="关闭"
+            android:summaryOn="打开"/>
+        <SwitchPreference
+            android:key="RELAY4"
+            android:title="4路继电器控制"
+            android:summaryOff="关闭"
+            android:summaryOn="打开"/>
+        <SwitchPreference
+            android:key="RELAY5"
+            android:title="5路继电器控制"
+            android:summaryOff="关闭"
+            android:summaryOn="打开"/>
+        <SwitchPreference
+            android:key="RELAY6"
+            android:title="6路继电器控制"
+            android:summary="保留"/>
+        <SwitchPreference
+            android:key="RELAY7"
+            android:title="7路继电器控制"
+            android:summary="保留"/>
     </PreferenceScreen>
 
 </PreferenceScreen>

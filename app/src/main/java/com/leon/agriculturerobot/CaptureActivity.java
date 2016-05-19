@@ -1,5 +1,6 @@
 package com.leon.agriculturerobot;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,7 +13,10 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.leon.agriculturerobot.control.FitLineProcess;
 import com.leon.agriculturerobot.control.ImageProcess;
+import com.leon.agriculturerobot.control.MorphologyProcess;
+import com.leon.agriculturerobot.control.RecolorProcess;
 import com.leon.agriculturerobot.control.RemoteControl;
 import com.leon.agriculturerobot.control.RemoteControlInstance;
 
@@ -21,6 +25,9 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
 
@@ -155,7 +162,7 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
         mButtonDemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(CaptureActivity.this, "跳转到演示界面", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(CaptureActivity.this,DemoActivity.class));
             }
         });
 
@@ -273,9 +280,33 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
-        final Mat dst = new Mat();
+        final Mat gray = new Mat();
         ImageProcess imageProcess = new ImageProcess();
-        int result = imageProcess.apply(inputFrame.gray(),dst);
+        int result = imageProcess.apply(inputFrame.gray(),gray);
+
+        RecolorProcess recolorProcess = new RecolorProcess();
+        recolorProcess.apply(inputFrame.rgba(),gray);
+
+        final Mat threshold = new Mat();
+        Imgproc.threshold(gray,threshold,0,255,Imgproc.THRESH_OTSU);
+
+        final Mat morphology = new Mat();
+        MorphologyProcess morphologyProcess = new MorphologyProcess();
+        morphologyProcess.apply(threshold,morphology);
+
+        final Mat edge = new Mat();
+        Imgproc.Canny(morphology,edge,150,100,3,false);
+
+        Mat lines = new Mat();
+        Imgproc.HoughLinesP(edge,lines,1,Math.PI/180,70,0,0);
+
+//        Mat bgr = new Mat();
+//        Imgproc.cvtColor(edge,bgr,Imgproc.COLOR_GRAY2BGR);
+        Mat bgr = inputFrame.rgba();
+        Imgproc.line(bgr,new Point(bgr.cols()/2,0),new Point(bgr.cols()/2,bgr.rows()),new Scalar(0,255,0));
+
+        FitLineProcess fitLineProcess = new FitLineProcess();
+        fitLineProcess.apply(lines,bgr);
 
         if (mIsAuto) {
              /* 无人驾驶模式下的自动控制部分 */
@@ -301,8 +332,8 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
 //        }
             mRemoteControl.goRight();
         }
-
-        return dst;
+        System.gc();
+        return bgr;
     }
 
    private long mExitTime = 0;
