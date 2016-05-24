@@ -13,12 +13,12 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.leon.agriculturerobot.control.ControlSocket;
+import com.leon.agriculturerobot.control.ControlSocketInstance;
 import com.leon.agriculturerobot.control.FitLineProcess;
 import com.leon.agriculturerobot.control.ImageProcess;
 import com.leon.agriculturerobot.control.MorphologyProcess;
 import com.leon.agriculturerobot.control.RecolorProcess;
-import com.leon.agriculturerobot.control.RemoteControl;
-import com.leon.agriculturerobot.control.RemoteControlInstance;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -37,7 +37,8 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
     private CameraBridgeViewBase mCameraBridgeViewBase;
     private boolean mIsHide;
     private boolean mIsAuto;
-    private RemoteControl mRemoteControl;
+//    private RemoteControl mRemoteControl;
+    private ControlSocket mControlSocket;
     private Button mButtonForward;
     private Button mButtonBackward;
     private Button mButtonLeft;
@@ -78,13 +79,15 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
             }
         });
 
-        mRemoteControl = RemoteControlInstance.INSTANCE.getRemoteControl();
+//        mRemoteControl = RemoteControlInstance.INSTANCE.getRemoteControl();
+        mControlSocket = ControlSocketInstance.INSTANCE.getControlSocket();
 
         mButtonForward = (Button) findViewById(R.id.btnForward);
         mButtonForward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRemoteControl.goForward();
+//                mRemoteControl.goForward();
+                mControlSocket.goForward();
             }
         });
 
@@ -92,7 +95,8 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
         mButtonStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRemoteControl.goStop();
+//                mRemoteControl.goStop();
+                mControlSocket.goStop();
             }
         });
 
@@ -102,10 +106,12 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        mRemoteControl.goBackward();
+//                        mRemoteControl.goBackward();
+                        mControlSocket.goBackward();
                         break;
                     case MotionEvent.ACTION_UP:
-                        mRemoteControl.goStop();
+//                        mRemoteControl.goStop();
+                        mControlSocket.goStop();
                         break;
                     default:
                         break;
@@ -120,10 +126,12 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        mRemoteControl.goLeft();
+//                        mRemoteControl.goLeft();
+                        mControlSocket.goLeft();
                         break;
                     case MotionEvent.ACTION_UP:
-                        mRemoteControl.goStop();
+//                        mRemoteControl.goStop();
+                        mControlSocket.goStop();
                         break;
                     default:
                         break;
@@ -138,10 +146,12 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        mRemoteControl.goRight();
+//                        mRemoteControl.goRight();
+                        mControlSocket.goRight();
                         break;
                     case MotionEvent.ACTION_UP:
-                        mRemoteControl.goStop();
+//                        mRemoteControl.goStop();
+                        mControlSocket.goStop();
                         break;
                     default:
                         break;
@@ -175,7 +185,8 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
                 switch (checkedId) {
                     case R.id.rbManual:
                         mIsAuto = false;
-                        mRemoteControl.goStop();
+//                        mRemoteControl.goStop();
+                        mControlSocket.goStop();
                         Toast.makeText(CaptureActivity.this, "人机交互模式", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.rbAuto:
@@ -193,7 +204,8 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
         mSeekSpeed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mRemoteControl.setSpeed(progress);
+//                mRemoteControl.setSpeed(progress);
+                mControlSocket.setSpeed(progress);
             }
 
             @Override
@@ -261,7 +273,8 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
         }
 
         try {
-            mRemoteControl.getSocket().close();
+//            mRemoteControl.getSocket().close();
+            mControlSocket.getSocket().close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -330,7 +343,8 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
 //                mRemoteControl.goStop();
 //                break;
 //        }
-            mRemoteControl.goRight();
+//            mRemoteControl.goRight();
+            mControlSocket.goRight();
         }
         System.gc();
         return bgr;

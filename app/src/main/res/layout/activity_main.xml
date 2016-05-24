@@ -29,4 +29,10 @@
         android:layout_height="wrap_content"
         android:text="登录系统网关"
         android:onClick="startWeb"/>
+    <Button
+        android:id="@+id/btnTest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="测试入口"
+        android:onClick="startTest"/>
 </LinearLayout>

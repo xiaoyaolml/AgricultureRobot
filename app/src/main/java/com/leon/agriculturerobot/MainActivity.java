@@ -12,14 +12,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import com.leon.agriculturerobot.control.RemoteControl;
-import com.leon.agriculturerobot.control.RemoteControlInstance;
+import com.leon.agriculturerobot.control.ControlSocket;
+import com.leon.agriculturerobot.control.ControlSocketInstance;
 import com.leon.agriculturerobot.setting.SettingFragment;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button mButtonMain;
-    private RemoteControl mRemoteControl;
+//    private RemoteControl mRemoteControl;
+    private ControlSocket mControlSocket;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -31,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.add(R.id.layoutSetting, new SettingFragment(), "SETTING_FRAGMENT");
         fragmentTransaction.commit();
 
-        mRemoteControl = new RemoteControl();
+//        mRemoteControl = new RemoteControl();
+        mControlSocket = new ControlSocket();
 
         mButtonMain = (Button) findViewById(R.id.btnMain);
         mButtonMain.setOnClickListener(new View.OnClickListener() {
@@ -45,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
                     ProgressDialog progressDialog;
                     @Override
                     protected Boolean doInBackground(String... params) {
-                        return mRemoteControl.init(params[0],params[1]);
+//                        return mRemoteControl.init(params[0],params[1]);
+                        return mControlSocket.init(params[0],params[1]);
                     }
 
                     @Override
@@ -57,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
                     protected void onPostExecute(Boolean aBoolean) {
                         progressDialog.dismiss();
                         if (aBoolean) {
-                            RemoteControlInstance.INSTANCE.setRemoteControl(mRemoteControl);
+//                            RemoteControlInstance.INSTANCE.setRemoteControl(mRemoteControl);
+                            ControlSocketInstance.INSTANCE.setControlSocket(mControlSocket);
                             startActivity(new Intent(MainActivity.this, CaptureActivity.class));
                             finish();
                         } else {
@@ -74,18 +78,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        mLocalControl = new LocalControl();
-//        boolean isSuccess = mLocalControl.init();
-//        if (isSuccess) {
-//            Toast.makeText(MainActivity.this, "成功", Toast.LENGTH_SHORT).show();
-//        } else {
-//            Toast.makeText(MainActivity.this, "失败", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
     }
 
     public void startWeb(View view) {
         startActivity(new Intent(this,WebActivity.class));
     }
 
+    public void startTest(View view) {
+        startActivity(new Intent(MainActivity.this, CaptureActivity.class));
+    }
 }
