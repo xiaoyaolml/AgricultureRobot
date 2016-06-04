@@ -14,7 +14,6 @@ import android.widget.Button;
 
 import com.leon.agriculturerobot.control.ControlSocket;
 import com.leon.agriculturerobot.control.ControlSocketInstance;
-import com.leon.agriculturerobot.setting.SettingFragment;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -24,7 +24,7 @@ public class LocalControl implements Control {
     public boolean init(String... args) {
         boolean isSuccess = false;
         try {
-            mSerialPort = new SerialPort(new File(Constant.SERIAL_PORT_PATH),Constant.SERIAL_PORT_BAUDRATE,0);
+            mSerialPort = new SerialPort(new File(Constant.SERIAL_PORT_PATH), Constant.SERIAL_PORT_BAUDRATE, 0);
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
             isSuccess = true;
@@ -82,7 +82,7 @@ public class LocalControl implements Control {
 
     }
 
-    class  RecvThread extends Thread {
+    class RecvThread extends Thread {
         @Override
         public void run() {
             super.run();
@@ -94,7 +94,7 @@ public class LocalControl implements Control {
                 }
                 try {
                     size = mInputStream.read(buffer);
-                    if (size>0) {
+                    if (size > 0) {
                         onDataReceived(buffer, size);
                     }
                 } catch (IOException e) {

@@ -19,7 +19,7 @@ public class ControlSocket extends ControlAdapter {
     public boolean init(String... args) {
         boolean isSuccess = false;
         try {
-            SocketPort socketPort = new SocketPort(args[0],args[1]);
+            SocketPort socketPort = new SocketPort(args[0], args[1]);
             mSocket = socketPort.getSocket();
             super.setOutputStream(mSocket.getOutputStream());
             isSuccess = true;

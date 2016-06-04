@@ -22,7 +22,7 @@ public class RemoteControl implements Control {
     public boolean init(String... args) {
         boolean isSuccess = false;
         try {
-            SocketPort socketPort = new SocketPort(args[0],args[1]);
+            SocketPort socketPort = new SocketPort(args[0], args[1]);
             mSocket = socketPort.getSocket();
             mOutputStream = mSocket.getOutputStream();
             isSuccess = true;
@@ -60,15 +60,15 @@ public class RemoteControl implements Control {
     @Override
     public void setSpeed(int speed) {
         byte[] commands = {(byte) 0xff, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0xff};
-        commands[3] =  (byte) speed;
+        commands[3] = (byte) speed;
         sendCommand(commands);
     }
 
     @Override
     public void setRelay(int which, int mode) {
         byte[] commands = {(byte) 0xff, (byte) 0x02, (byte) 0x00, (byte) 0x00, (byte) 0xff};
-        commands[2] =  (byte) which;
-        commands[3] =  (byte) mode;
+        commands[2] = (byte) which;
+        commands[3] = (byte) mode;
         sendCommand(commands);
     }
 

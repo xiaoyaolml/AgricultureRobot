@@ -5,12 +5,18 @@ package com.leon.agriculturerobot.control;
  */
 public interface Control {
     boolean init(String... args);
+
     void goForward();
+
     void goBackward();
+
     void goLeft();
+
     void goRight();
+
     void goStop();
 
     void setSpeed(int speed);
-    void setRelay(int which,int mode);
+
+    void setRelay(int which, int mode);
 }

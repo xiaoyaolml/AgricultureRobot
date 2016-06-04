@@ -1,4 +1,4 @@
-package com.leon.agriculturerobot.setting;
+package com.leon.agriculturerobot;
 
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -6,7 +6,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
-import com.leon.agriculturerobot.R;
 import com.leon.agriculturerobot.utils.SerialPortFinder;
 
 /**

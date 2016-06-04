@@ -8,7 +8,7 @@ import java.io.OutputStream;
 /**
  * Created by LML on 2016-05-24.
  */
-public abstract class ControlAdapter implements Control{
+public abstract class ControlAdapter implements Control {
     private OutputStream mOutputStream;
 
     public void setOutputStream(OutputStream outputStream) {
@@ -43,15 +43,15 @@ public abstract class ControlAdapter implements Control{
     @Override
     public void setRelay(int which, int mode) {
         byte[] commands = {(byte) 0xff, (byte) 0x02, (byte) 0x00, (byte) 0x00, (byte) 0xff};
-        commands[2] =  (byte) which;
-        commands[3] =  (byte) mode;
+        commands[2] = (byte) which;
+        commands[3] = (byte) mode;
         sendCommand(commands);
     }
 
     @Override
     public void setSpeed(int speed) {
         byte[] commands = {(byte) 0xff, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0xff};
-        commands[3] =  (byte) speed;
+        commands[3] = (byte) speed;
         sendCommand(commands);
     }
 

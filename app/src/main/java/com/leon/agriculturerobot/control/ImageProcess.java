@@ -17,12 +17,12 @@ public class ImageProcess implements Process {
         src.copyTo(dst);
 //        System.gc();
         switch (flag) {
-           case 0: // 特殊情况一，停止
-               result = Constant.GO_STOP_CODE;
-               break;
-           case 1: // 检测为直线，前进
-               result = Constant.GO_FORWARD_CODE;
-               break;
+            case 0: // 特殊情况一，停止
+                result = Constant.GO_STOP_CODE;
+                break;
+            case 1: // 检测为直线，前进
+                result = Constant.GO_FORWARD_CODE;
+                break;
             case 2: // 特殊情况二，后退
                 result = Constant.GO_BACKWARD_CODE;
                 break;
@@ -32,10 +32,10 @@ public class ImageProcess implements Process {
             case 4: // 检测为偏右，右转
                 result = Constant.GO_RIGHT_CODE;
                 break;
-           default:
-               break;
+            default:
+                break;
         }
-        
+
         return result;
     }
 }

@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -16,7 +19,6 @@ import android.widget.Toast;
 import com.leon.agriculturerobot.control.ControlSocket;
 import com.leon.agriculturerobot.control.ControlSocketInstance;
 import com.leon.agriculturerobot.control.FitLineProcess;
-import com.leon.agriculturerobot.control.ImageProcess;
 import com.leon.agriculturerobot.control.MorphologyProcess;
 import com.leon.agriculturerobot.control.RecolorProcess;
 
@@ -31,13 +33,30 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
 
-public class CaptureActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2{
+public class CaptureActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final String TAG = "CaptureActivity";
     private CameraBridgeViewBase mCameraBridgeViewBase;
+    public static final int VIEW_MODE_RGBA = 0;
+    public static final int VIEW_MODE_GREEN = 1;
+    public static final int VIEW_MODE_THRESHOLD = 2;
+    public static final int VIEW_MODE_MORPHOLOGY = 3;
+    public static final int VIEW_MODE_EDGE = 4;
+    public static final int VIEW_MODE_HOUGH = 5;
+    public static final int VIEW_MODE_FIT_LINE = 6;
+    public static int mViewMode = VIEW_MODE_FIT_LINE;
+    private Mat mGreen;
+    private Mat mTemp;
+    private RecolorProcess mRecolorProcess;
+    private Mat mThreshold;
+    private MorphologyProcess mMorphologyProcess;
+    private Mat mMorphology;
+    private Mat mEdge;
+    private Mat mHoughLines;
+    private FitLineProcess mFitLineProcess;
+
     private boolean mIsHide;
     private boolean mIsAuto;
-//    private RemoteControl mRemoteControl;
     private ControlSocket mControlSocket;
     private Button mButtonForward;
     private Button mButtonBackward;
@@ -67,6 +86,9 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_capture);
 
         mCameraBridgeViewBase = (CameraBridgeViewBase) findViewById(R.id.cameraView);
@@ -74,19 +96,17 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
         mCameraBridgeViewBase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mIsHide = ! mIsHide;
+                mIsHide = !mIsHide;
                 hideView(mIsHide);
             }
         });
 
-//        mRemoteControl = RemoteControlInstance.INSTANCE.getRemoteControl();
         mControlSocket = ControlSocketInstance.INSTANCE.getControlSocket();
 
         mButtonForward = (Button) findViewById(R.id.btnForward);
         mButtonForward.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mRemoteControl.goForward();
                 mControlSocket.goForward();
             }
         });
@@ -95,7 +115,6 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
         mButtonStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mRemoteControl.goStop();
                 mControlSocket.goStop();
             }
         });
@@ -106,11 +125,9 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-//                        mRemoteControl.goBackward();
                         mControlSocket.goBackward();
                         break;
                     case MotionEvent.ACTION_UP:
-//                        mRemoteControl.goStop();
                         mControlSocket.goStop();
                         break;
                     default:
@@ -126,11 +143,9 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-//                        mRemoteControl.goLeft();
                         mControlSocket.goLeft();
                         break;
                     case MotionEvent.ACTION_UP:
-//                        mRemoteControl.goStop();
                         mControlSocket.goStop();
                         break;
                     default:
@@ -146,11 +161,9 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-//                        mRemoteControl.goRight();
                         mControlSocket.goRight();
                         break;
                     case MotionEvent.ACTION_UP:
-//                        mRemoteControl.goStop();
                         mControlSocket.goStop();
                         break;
                     default:
@@ -164,6 +177,7 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
         mButtonPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // TODO: 2016-06-03  拍照保存
                 Toast.makeText(CaptureActivity.this, "拍照已保存", Toast.LENGTH_SHORT).show();
             }
         });
@@ -172,7 +186,7 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
         mButtonDemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(CaptureActivity.this,DemoActivity.class));
+                startActivity(new Intent(CaptureActivity.this, DemoActivity.class));
             }
         });
 
@@ -185,7 +199,6 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
                 switch (checkedId) {
                     case R.id.rbManual:
                         mIsAuto = false;
-//                        mRemoteControl.goStop();
                         mControlSocket.goStop();
                         Toast.makeText(CaptureActivity.this, "人机交互模式", Toast.LENGTH_SHORT).show();
                         break;
@@ -204,7 +217,6 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
         mSeekSpeed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                mRemoteControl.setSpeed(progress);
                 mControlSocket.setSpeed(progress);
             }
 
@@ -273,7 +285,6 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
         }
 
         try {
-//            mRemoteControl.getSocket().close();
             mControlSocket.getSocket().close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -281,45 +292,141 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
     }
 
     @Override
-    public void onCameraViewStarted(int width, int height) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_capture, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_rgba:
+                mViewMode = VIEW_MODE_RGBA;
+                break;
+            case R.id.action_green:
+                mViewMode = VIEW_MODE_GREEN;
+                break;
+            case R.id.action_threshold:
+                mViewMode = VIEW_MODE_THRESHOLD;
+                break;
+            case R.id.action_morphology:
+                mViewMode = VIEW_MODE_MORPHOLOGY;
+                break;
+            case R.id.action_edge:
+                mViewMode = VIEW_MODE_EDGE;
+                break;
+            case R.id.action_hough:
+                mViewMode = VIEW_MODE_HOUGH;
+                break;
+            case R.id.action_fit_line:
+                mViewMode = VIEW_MODE_FIT_LINE;
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
+    public void onCameraViewStarted(int width, int height) {
+        mGreen = new Mat();
+        mTemp = new Mat();
+        mRecolorProcess = new RecolorProcess();
+        mThreshold = new Mat();
+        mMorphology = new Mat();
+        mMorphologyProcess = new MorphologyProcess();
+        mEdge = new Mat();
+        mHoughLines = new Mat();
+        mFitLineProcess = new FitLineProcess();
     }
 
     @Override
     public void onCameraViewStopped() {
-
+        if (mGreen != null) {
+            mGreen.release();
+            mGreen = null;
+        }
+        if (mTemp != null) {
+            mTemp.release();
+            mTemp = null;
+        }
+        if (mThreshold != null) {
+            mThreshold.release();
+            mThreshold = null;
+        }
+        if (mMorphology != null) {
+            mMorphology.release();
+            mMorphology = null;
+        }
+        if (mEdge != null) {
+            mEdge.release();
+            mEdge = null;
+        }
+        if (mHoughLines != null) {
+            mHoughLines.release();
+            mHoughLines = null;
+        }
     }
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        Mat rgba = inputFrame.rgba();
+        int rows = rgba.rows();
+        int cols = rgba.cols();
+        Mat rgbaROI = rgba.submat(0, rows, cols / 4, cols * 3 / 4);
 
-        final Mat gray = new Mat();
-        ImageProcess imageProcess = new ImageProcess();
-        int result = imageProcess.apply(inputFrame.gray(),gray);
+        switch (mViewMode) {
+            case VIEW_MODE_RGBA:
+                break;
+            case VIEW_MODE_GREEN:
+                mRecolorProcess.apply(rgbaROI, mTemp);
+                Imgproc.cvtColor(mTemp, rgbaROI, Imgproc.COLOR_GRAY2BGRA, 4);
+                break;
+            case VIEW_MODE_THRESHOLD:
+                mRecolorProcess.apply(rgbaROI, mGreen);
+                Imgproc.threshold(mGreen, mTemp, 0, 255, Imgproc.THRESH_OTSU);
+                Imgproc.cvtColor(mTemp, rgbaROI, Imgproc.COLOR_GRAY2BGRA, 4);
+                break;
+            case VIEW_MODE_MORPHOLOGY:
+                mRecolorProcess.apply(rgbaROI, mGreen);
+                Imgproc.threshold(mGreen, mThreshold, 0, 255, Imgproc.THRESH_OTSU);
+                mMorphologyProcess.apply(mThreshold, mTemp);
+                Imgproc.cvtColor(mTemp, rgbaROI, Imgproc.COLOR_GRAY2BGRA, 4);
+                break;
+            case VIEW_MODE_EDGE:
+                mRecolorProcess.apply(rgbaROI, mGreen);
+                Imgproc.threshold(mGreen, mThreshold, 0, 255, Imgproc.THRESH_OTSU);
+                mMorphologyProcess.apply(mThreshold, mMorphology);
+                Imgproc.Canny(mMorphology, mTemp, 150, 100, 3, false);
+                Imgproc.cvtColor(mTemp, rgbaROI, Imgproc.COLOR_GRAY2BGRA, 4);
+                break;
+            case VIEW_MODE_HOUGH:
+                mRecolorProcess.apply(rgbaROI, mGreen);
+                Imgproc.threshold(mGreen, mThreshold, 0, 255, Imgproc.THRESH_OTSU);
+                mMorphologyProcess.apply(mThreshold, mMorphology);
+                Imgproc.Canny(mMorphology, mEdge, 150, 100, 3, false);
+                Imgproc.HoughLinesP(mEdge, mHoughLines, 1, Math.PI / 180, 40, 0, 0);
 
-        RecolorProcess recolorProcess = new RecolorProcess();
-        recolorProcess.apply(inputFrame.rgba(),gray);
+                for (int i = 0; i < mHoughLines.rows(); i++) {
+                    double[] var = mHoughLines.get(i, 0);
+                    Imgproc.line(rgbaROI, new Point(var[0], var[1]), new Point(var[2], var[3]), new Scalar(255, 0, 0), 5);
+                }
+                break;
+            case VIEW_MODE_FIT_LINE:
+                // 三根辅助线
+                Imgproc.line(rgbaROI, new Point(0, 0), new Point(0, rgbaROI.rows()), new Scalar(0, 255, 0), 1);
+                Imgproc.line(rgbaROI, new Point(0.5 * rgbaROI.cols(), 0), new Point(0.5 * rgbaROI.cols(), rgbaROI.rows()), new Scalar(0, 255, 0), 1);
+                Imgproc.line(rgbaROI, new Point(rgbaROI.cols(), 0), new Point(rgbaROI.cols(), rgbaROI.rows()), new Scalar(0, 255, 0), 2);
 
-        final Mat threshold = new Mat();
-        Imgproc.threshold(gray,threshold,0,255,Imgproc.THRESH_OTSU);
+                mRecolorProcess.apply(rgbaROI, mGreen);
+                Imgproc.threshold(mGreen, mThreshold, 0, 255, Imgproc.THRESH_OTSU);
+                mMorphologyProcess.apply(mThreshold, mMorphology);
+                Imgproc.Canny(mMorphology, mEdge, 150, 100, 3, false);
+                Imgproc.HoughLinesP(mEdge, mHoughLines, 1, Math.PI / 180, 30, 0, 0);
+                mFitLineProcess.apply(mHoughLines, rgbaROI);
+                break;
+        }
 
-        final Mat morphology = new Mat();
-        MorphologyProcess morphologyProcess = new MorphologyProcess();
-        morphologyProcess.apply(threshold,morphology);
-
-        final Mat edge = new Mat();
-        Imgproc.Canny(morphology,edge,150,100,3,false);
-
-        Mat lines = new Mat();
-        Imgproc.HoughLinesP(edge,lines,1,Math.PI/180,70,0,0);
-
-//        Mat bgr = new Mat();
-//        Imgproc.cvtColor(edge,bgr,Imgproc.COLOR_GRAY2BGR);
-        Mat bgr = inputFrame.rgba();
-        Imgproc.line(bgr,new Point(bgr.cols()/2,0),new Point(bgr.cols()/2,bgr.rows()),new Scalar(0,255,0));
-
-        FitLineProcess fitLineProcess = new FitLineProcess();
-        fitLineProcess.apply(lines,bgr);
 
         if (mIsAuto) {
              /* 无人驾驶模式下的自动控制部分 */
@@ -346,16 +453,17 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
 //            mRemoteControl.goRight();
             mControlSocket.goRight();
         }
-        System.gc();
-        return bgr;
+//        System.gc();
+        return rgba;
     }
 
-   private long mExitTime = 0;
+    private long mExitTime = 0;
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
             if ((System.currentTimeMillis() - mExitTime) > 2500) {
-                Toast.makeText(getApplicationContext(), "再按一次退出"+getString(R.string.app_name), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "再按一次退出" + getString(R.string.app_name), Toast.LENGTH_SHORT).show();
                 mExitTime = System.currentTimeMillis();
             } else {
                 finish();

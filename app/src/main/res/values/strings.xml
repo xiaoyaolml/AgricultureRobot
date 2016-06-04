@@ -5,4 +5,12 @@
     <string name="default_port">2016</string>
     <string name="title_activity_web">嵌入式网关配置</string>
     <string name="title_activity_demo">图像处理效果</string>
+    <!--菜单按钮-->
+    <string name="action_rgba">原始RGBA</string>
+    <string name="action_green">超绿变换</string>
+    <string name="action_threshold">阈值分割</string>
+    <string name="action_morphology">形态学滤波</string>
+    <string name="action_edge">边缘检测</string>
+    <string name="action_hough">霍夫变换</string>
+    <string name="action_fit_line">中心线提取</string>
 </resources>

@@ -5,9 +5,11 @@ package com.leon.agriculturerobot.control;
  */
 public enum RemoteControlInstance {
     INSTANCE;
+
     RemoteControlInstance() {
 
     }
+
     private RemoteControl mRemoteControl;
 
     public RemoteControl getRemoteControl() {

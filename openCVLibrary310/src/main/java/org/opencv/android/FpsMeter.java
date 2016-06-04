@@ -1,13 +1,13 @@
 package org.opencv.android;
 
-import java.text.DecimalFormat;
-
-import org.opencv.core.Core;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
+
+import org.opencv.core.Core;
+
+import java.text.DecimalFormat;
 
 public class FpsMeter {
     private static final String TAG               = "FpsMeter";
@@ -31,7 +31,9 @@ public class FpsMeter {
 
         mPaint = new Paint();
         mPaint.setColor(Color.BLUE);
-        mPaint.setTextSize(20);
+//        mPaint.setTextSize(20);
+        // TODO: 2016-06-04 此处修改了帧显示文字默认大小 
+        mPaint.setTextSize(50);
     }
 
     public void measure() {
