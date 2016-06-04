@@ -13,7 +13,7 @@ public class RecolorProcess implements Process {
     private final ArrayList<Mat> mChannels = new ArrayList<>(4);
 
     @Override
-    public int apply(Mat src, Mat dst) {
+    public void apply(Mat src, Mat dst) {
         Core.split(src, mChannels);
         final Mat r = mChannels.get(0);
         final Mat g = mChannels.get(1);
@@ -23,6 +23,5 @@ public class RecolorProcess implements Process {
         r.release();
         g.release();
         b.release();
-        return 0;
     }
 }

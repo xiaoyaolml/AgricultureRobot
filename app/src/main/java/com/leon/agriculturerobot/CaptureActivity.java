@@ -16,6 +16,7 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.leon.agriculturerobot.config.Constant;
 import com.leon.agriculturerobot.control.ControlSocket;
 import com.leon.agriculturerobot.control.ControlSocketInstance;
 import com.leon.agriculturerobot.control.FitLineProcess;
@@ -44,7 +45,7 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
     public static final int VIEW_MODE_EDGE = 4;
     public static final int VIEW_MODE_HOUGH = 5;
     public static final int VIEW_MODE_FIT_LINE = 6;
-    public static int mViewMode = VIEW_MODE_FIT_LINE;
+    public static int mViewMode = VIEW_MODE_RGBA;
     private Mat mGreen;
     private Mat mTemp;
     private RecolorProcess mRecolorProcess;
@@ -204,6 +205,7 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
                         break;
                     case R.id.rbAuto:
                         Toast.makeText(CaptureActivity.this, "无人驾驶模式", Toast.LENGTH_SHORT).show();
+                        mViewMode = VIEW_MODE_FIT_LINE;
                         mIsAuto = true;
                         hideView(true);
                         break;
@@ -429,29 +431,28 @@ public class CaptureActivity extends AppCompatActivity implements CameraBridgeVi
 
 
         if (mIsAuto) {
+            int result = mFitLineProcess.translate();
              /* 无人驾驶模式下的自动控制部分 */
-//        switch (result) {
-//            case Constant.GO_FORWARD_CODE:
-//                mRemoteControl.goForward();
-//                break;
-//            case Constant.GO_BACKWARD_CODE:
-//                mRemoteControl.goBackward();
-//                break;
-//            case Constant.GO_LEFT_CODE:
-//                mRemoteControl.goLeft();
-//                break;
-//            case Constant.GO_RIGHT_CODE:
-//                mRemoteControl.goRight();
-//                break;
-//            case Constant.GO_STOP_CODE:
-//                mRemoteControl.goStop();
-//                break;
-//            default:
-//                mRemoteControl.goStop();
-//                break;
-//        }
-//            mRemoteControl.goRight();
-            mControlSocket.goRight();
+            switch (result) {
+                case Constant.GO_FORWARD_CODE:
+                    mControlSocket.goForward();
+                    break;
+                case Constant.GO_BACKWARD_CODE:
+                    mControlSocket.goBackward();
+                    break;
+                case Constant.GO_LEFT_CODE:
+                    mControlSocket.goLeft();
+                    break;
+                case Constant.GO_RIGHT_CODE:
+                    mControlSocket.goRight();
+                    break;
+                case Constant.GO_STOP_CODE:
+                    mControlSocket.goStop();
+                    break;
+                default:
+                    mControlSocket.goStop();
+                    break;
+            }
         }
 //        System.gc();
         return rgba;

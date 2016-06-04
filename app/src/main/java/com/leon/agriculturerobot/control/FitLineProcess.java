@@ -2,6 +2,8 @@ package com.leon.agriculturerobot.control;
 
 import android.util.Log;
 
+import com.leon.agriculturerobot.config.Constant;
+
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
@@ -17,9 +19,11 @@ import java.util.List;
 public class FitLineProcess implements Process {
     private static final String TAG = "FitLineProcess";
     private List<Point> mPoints = new ArrayList<>();
+    private double mSlope;
+    public static final double SLOPE_VALUE = 5.0;
 
     @Override
-    public int apply(Mat src, Mat dst) {
+    public void apply(Mat src, Mat dst) {
         int rows = dst.rows();
         for (int i = 0; i < src.rows(); i++) {
             double[] var = src.get(i, 0);
@@ -40,17 +44,41 @@ public class FitLineProcess implements Process {
                 double[] var = line.get(i, 0);
                 vars.add(var[0]);
             }
-            double k = vars.get(1) / vars.get(0);
-            double b = vars.get(3) - vars.get(2) * k;
-            Imgproc.line(dst, new Point((rows - b) / k, rows), new Point(-b / k, 0), new Scalar(0, 0, 255), 5);
+//            double k = vars.get(1) / vars.get(0);
+            mSlope = vars.get(1) / vars.get(0);
+            double b = vars.get(3) - vars.get(2) * mSlope;
+            Imgproc.line(dst, new Point((rows - b) / mSlope, rows), new Point(-b / mSlope, 0), new Scalar(0, 0, 255), 5);
 
             matOfPoint.release();
             line.release();
         } else {
             Log.d(TAG, "no point fit");
+            mSlope = 0;
         }
         mPoints.clear();
-        return 0;
+    }
+
+    public int translate() {
+        int result;
+        if (Math.abs(mSlope) > 5) {
+            // 前进
+            Log.i(TAG, mSlope + "：前进");
+            result = Constant.GO_FORWARD_CODE;
+        } else if ((mSlope > 0) && (mSlope <= SLOPE_VALUE)) {
+            // 左转
+            Log.i(TAG, mSlope + "：左转");
+            result = Constant.GO_LEFT_CODE;
+        } else if ((mSlope >= -SLOPE_VALUE) && (mSlope < 0)) {
+            // 右转
+            result = Constant.GO_RIGHT_CODE;
+            Log.i(TAG, mSlope + "：右转");
+        } else {
+            // 停止
+            result = Constant.GO_STOP_CODE;
+            Log.i(TAG, mSlope + "：停止");
+        }
+
+        return result;
     }
 
 //    @Override
